@@ -12,13 +12,42 @@
         <h1>Candy Shop</h1>
     </header>
     <div class="input-group container-fluid w-75 mb-4">
-  <input type="text" aria-label="Candy name" placeholder="Candy name" class="form-control">
-  <input type="text" aria-label="Description" placeholder="Description" class="form-control">
-  <input type="number" aria-label="Price" placeholder="Price" class="form-control">
-  <input type="number" aria-label="Quantity" placeholder="Quantity" class="form-control">
-  <button class="btn btn-outline-secondary" type="button">Submit</button>
+  <input type="text" aria-label="Candy name" id="candy" placeholder="Candy name" class="form-control">
+  <input type="text" aria-label="Description" id="description" placeholder="Description" class="form-control">
+  <input type="number" aria-label="Price" id="price" placeholder="Price" class="form-control">
+  <input type="number" aria-label="Quantity" id="quantity" placeholder="Quantity" class="form-control">
+  <button class="btn btn-outline-secondary" id="submit" type="button">Submit</button>
 </div>
 <hr>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+<script>
+    let candy = document.getElementById('candy');
+    let description = document.getElementById('description');
+    let price = document.getElementById('price');
+    let quantity = document.getElementById('quantity');
+    let submit = document.getElementById('submit');
+    const submitData = (Candy,Desc,Price,Quant) => {
+        axios.post('/candies',{
+            'candy':Candy,
+            'description':Desc,
+            'price':Price,
+            'quantity':Quant
+        })
+        .then(resp => {
+            console.log("response: ",resp);
+        })
+        .catch(err => {
+            console.log("error: ",err);
+        })
+    }
+    submit.addEventListener('click',()=>{
+        if(candy.value == "" || description.value == "" || price.value == "" || quantity.value == ""){
+            alert("Fill all the information!!");
+        }else{
+            submitData(candy.value,description.value,price.value,quantity.value);
+        }
+    })
+</script>
 </body>
 </html>
