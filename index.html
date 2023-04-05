@@ -19,6 +19,21 @@
   <button class="btn btn-outline-secondary" id="submit" type="button">Submit</button>
 </div>
 <hr>
+<div class="container-fluid w-75 mt-4">
+    <table class="table table-bordered table-primary">
+        <thead>
+          <tr>
+            <th scope="col">Candy</th>
+            <th scope="col">Description</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Purchase</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
 <script>
@@ -27,8 +42,76 @@
     let price = document.getElementById('price');
     let quantity = document.getElementById('quantity');
     let submit = document.getElementById('submit');
+    let table = document.querySelector('table');
+    window.onload = getCandies();
+    
+    function getCandies(){
+    axios.get('/candies')
+    .then(result => {
+        return result.data;
+    })
+    .then(data => {
+        for(let candy of data){
+            const row = table.insertRow();
+            let col1 = row.insertCell(0);
+            let col2 = row.insertCell(1);
+            let col3 = row.insertCell(2);
+            let col4 = row.insertCell(3);
+            let col5 = row.insertCell(4);
+            col1.innerHTML = candy.candy;
+            col2.innerHTML = candy.description;
+            col3.innerHTML = candy.price+" Rs";
+            col4.innerHTML = candy.quantity;
+            col5.innerHTML = `
+            <button type="button" id="btn-1-${candy.id}" class="btn btn-success">Buy 1</button>
+            <button type="button" id="btn-2-${candy.id}" class="btn btn-success mx-2">Buy 2</button>
+            <button type="button" id="btn-3-${candy.id}" class="btn btn-success">Buy 3</button>
+            `;
+            col5.id = candy.id;
+            let btn1 = document.getElementById(`btn-1-${candy.id}`);
+            let btn2 = document.getElementById(`btn-2-${candy.id}`);
+            let btn3 = document.getElementById(`btn-3-${candy.id}`);
+            btn1.addEventListener('click',(e) => {
+                if(candy.quantity >= 1){
+                    col4.innerHTML = candy.quantity-1;
+                    removeCandy(e.target.parentElement.id,1);
+                }else{
+                    alert(`There is no ${candy.candy} available here`)
+                }
+            })
+            btn2.addEventListener('click',(e) => {
+                if(candy.quantity >= 2){
+                    col4.innerHTML = candy.quantity-2;
+                removeCandy(e.target.parentElement.id,2);
+                }else{
+                    alert(`There is no ${candy.candy} available here`)
+                }
+            })
+            btn3.addEventListener('click',(e) => {
+                if(candy.quantity >= 3){
+                    col4.innerHTML = candy.quantity-3;
+                removeCandy(e.target.parentElement.id,3);
+                }else{
+                    alert(`There is no ${candy.candy} available here`)
+                }
+            })
+        }
+    })
+}
+    function removeCandy(id,num){
+        console.log(id,num);
+        axios.post(`/remove/${id}?qnty=${num}`)
+        .then((result)=>{
+            console.log(result);
+            getCandies()
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
     const submitData = (Candy,Desc,Price,Quant) => {
-        axios.post('/candies',{
+        axios.post('/candy',{
             'candy':Candy,
             'description':Desc,
             'price':Price,
@@ -36,6 +119,7 @@
         })
         .then(resp => {
             console.log("response: ",resp);
+            getCandies();
         })
         .catch(err => {
             console.log("error: ",err);

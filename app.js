@@ -10,7 +10,35 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.post('/candies',(req,res,next) => {
+app.get('/candies',(req,res,next) => {
+    Candy.findAll()
+    .then(resp => {
+        res.send(resp);
+    })
+})
+
+app.post('/remove/:id',async (req,res,next) => {
+    console.log(req.params.id);
+    console.log(req.query.qnty);
+    const candy = await Candy.findOne({ where: { id: req.params.id } });
+if (candy) {
+  let quantity = candy.quantity;
+  candy.quantity = quantity - (+req.query.qnty);
+  await candy.save();
+  res.json({
+    "message": "Successfully Updated",
+    "data": candy
+  })
+} else {
+  console.log("User not found");
+  res.json({
+    "message": "User not found",
+  })
+}
+})
+
+
+app.post('/candy',(req,res,next) => {
     if(req.body == null || req.body.candy == null || req.body.candy == undefined){
         res.status(404).send({
             "message": "Not found"
