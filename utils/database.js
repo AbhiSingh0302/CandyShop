@@ -31,20 +31,4 @@ const Candy = sequelize.define("candies", {
     timestamps: false
  });
 
-sequelize.sync().then(() => {
-   console.log('Book table created successfully!');
-
-   Candy.create({
-    candy: "Clean Code",
-    description: "Robert Cecil Martin",
-    price: 2,
-    quantity: 3
-   }).then(res => {
-       console.log(res)
-   }).catch((error) => {
-       console.error('Failed to create a new record : ', error);
-   });
-
-}).catch((error) => {
-   console.error('Unable to create table : ', error);
-});
+module.exports = Candy;

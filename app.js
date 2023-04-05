@@ -4,6 +4,8 @@ const path = require('path');
 
 const bodyParser = require('body-parser');
 
+const Candy = require('./utils/database');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -15,10 +17,24 @@ app.post('/candies',(req,res,next) => {
         })
     }
     else{
-        res.send({
-            "message": "Successfully Submitted",
-            "data": req.body
+        Candy.create({
+            candy: req.body.candy,
+            description: req.body.description,
+            price: req.body.price,
+            quantity: req.body.quantity
         })
+        .then(resp => {
+            console.log(resp);
+            res.send({
+                "message": "Successfully Submitted",
+                "data": resp
+            })
+        }).catch((error) => {
+            console.error('Failed to create a new record : ', error);
+            res.status(405).send({
+                "message": "Failed to create a new record"
+            })
+        });
     }
 })
 
@@ -27,4 +43,4 @@ app.get('/',(req,res,next) => {
 })
 
 
-app.listen(3000);
+app.listen(4000);
