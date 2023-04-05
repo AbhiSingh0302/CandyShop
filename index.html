@@ -43,15 +43,8 @@
     let quantity = document.getElementById('quantity');
     let submit = document.getElementById('submit');
     let table = document.querySelector('table');
-    window.onload = getCandies();
-    
-    function getCandies(){
-    axios.get('/candies')
-    .then(result => {
-        return result.data;
-    })
-    .then(data => {
-        for(let candy of data){
+    function insertRow(candies){
+        for(let candy of candies){
             const row = table.insertRow();
             let col1 = row.insertCell(0);
             let col2 = row.insertCell(1);
@@ -73,7 +66,7 @@
             let btn3 = document.getElementById(`btn-3-${candy.id}`);
             btn1.addEventListener('click',(e) => {
                 if(candy.quantity >= 1){
-                    col4.innerHTML = candy.quantity-1;
+                    col4.innerHTML = col4.innerHTML-1;
                     removeCandy(e.target.parentElement.id,1);
                 }else{
                     alert(`There is no ${candy.candy} available here`)
@@ -81,7 +74,7 @@
             })
             btn2.addEventListener('click',(e) => {
                 if(candy.quantity >= 2){
-                    col4.innerHTML = candy.quantity-2;
+                    col4.innerHTML = col4.innerHTML-2;
                 removeCandy(e.target.parentElement.id,2);
                 }else{
                     alert(`There is no ${candy.candy} available here`)
@@ -89,13 +82,24 @@
             })
             btn3.addEventListener('click',(e) => {
                 if(candy.quantity >= 3){
-                    col4.innerHTML = candy.quantity-3;
+                    col4.innerHTML = col4.innerHTML-3;
                 removeCandy(e.target.parentElement.id,3);
                 }else{
                     alert(`There is no ${candy.candy} available here`)
                 }
             })
         }
+    }
+
+
+    window.onload = getCandies();
+    function getCandies(){
+    axios.get('/candies')
+    .then(result => {
+        return result.data;
+    })
+    .then(data => {
+        insertRow(data)
     })
 }
     function removeCandy(id,num){
@@ -103,7 +107,6 @@
         axios.post(`/remove/${id}?qnty=${num}`)
         .then((result)=>{
             console.log(result);
-            getCandies()
         })
         .catch((err)=>{
             console.log(err);
@@ -118,8 +121,8 @@
             'quantity':Quant
         })
         .then(resp => {
-            console.log("response: ",resp);
-            getCandies();
+            console.log("response: ",[resp.data.data]);
+            insertRow([resp.data.data])
         })
         .catch(err => {
             console.log("error: ",err);
